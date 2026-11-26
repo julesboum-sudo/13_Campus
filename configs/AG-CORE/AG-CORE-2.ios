@@ -1,0 +1,167 @@
+enable
+configure terminal
+hostname AG-CORE-2
+no ip domain lookup
+banner motd ^C Unauthorized access is prohibited and prosecuted.^C
+
+username adminCore2 privilege 15 secret 0 Ac@d3nspy_Adm!n
+enable secret 0 C@mpus_L@n2026
+ip domain name acadenspy.lab
+crypto key generate rsa modulus 2048
+ip ssh version 2
+
+line console 0
+ password C0ns0le_R0_2026
+ logging synchronous
+ exec-timeout 0 0
+ login 
+exit
+
+line vty 0 4
+ logging synchronous
+ exec-timeout 0 0
+ login local
+ transport input ssh
+exit
+
+snmp-server community Campus_LAN RO
+access-list 10 permit 172.17.200.250
+snmp-server community Campus_LAN RO 10
+snmp-server location AG-CORE 
+snmp-server contact julesdaroldb@gmail.com
+snmp-server host 172.17.200.250 version 2c Campus_LAN
+
+interface Loopback0
+ description firstLoopback
+ ip address 172.17.0.13 255.255.255.0
+ ip router isis 1
+ no shutdown
+exit
+
+interface Loopback1
+ description secondLoopback
+ ip address 172.17.99.13 255.255.255.255
+ ip router isis 1
+ no shutdown
+exit
+
+interface range Ethernet2/0-3
+ no switchport
+ description INTERCO_AG-CORE-1_LACP40
+ channel-protocol lacp
+ channel-group 40 mode active
+ no shutdown
+exit
+interface Port-channel40
+ description PO40_AG-CORE-2_to_AG-CORE-1
+ no switchport
+ ip address 172.17.1.18 255.255.255.252
+ ip router isis 1
+ no shutdown
+exit
+
+interface Ethernet0/2
+ description AG-CORE-2_INTERCO_RO-CORE-2
+ no switchport
+ ip address 43.17.1.14 255.255.255.252
+ ip router isis 1
+ no shutdown
+exit
+
+interface Ethernet0/3
+ description AG-CORE-2_INTERCO_RO-CORE1
+ no switchport
+ ip address 43.17.1.10 255.255.255.252
+ ip router isis 1
+ no shutdown
+exit
+
+interface Ethernet0/0
+ description AG-CORE-2_INTERCO_DIS-AG2
+ no switchport
+ ip address 172.17.1.33 255.255.255.252
+ ip router isis 1
+ no shutdown
+exit
+
+interface Ethernet0/1
+ description AG-CORE-2_INTERCO_DIS-AG1
+ no switchport
+ ip address 172.17.1.25 255.255.255.252
+ ip router isis 1
+ no shutdown
+exit
+
+ip routing
+router isis 1
+ net 49.0001.0000.0000.0004.00
+ is-type level-2-only
+ log-adjacency-changes
+ exit
+
+ip dhcp excluded-address 192.168.10.1 192.168.10.149
+ip dhcp excluded-address 192.168.10.250 192.168.10.254
+
+ip dhcp excluded-address 192.168.11.1 192.168.11.149
+ip dhcp excluded-address 192.168.11.250 192.168.11.254
+
+ip dhcp excluded-address 192.168.12.1 192.168.12.149
+ip dhcp excluded-address 192.168.12.250 192.168.12.254
+
+ip dhcp excluded-address 192.168.13.1 192.168.13.149
+ip dhcp excluded-address 192.168.13.250 192.168.13.254
+
+ip dhcp excluded-address 192.168.14.1 192.168.14.149
+ip dhcp excluded-address 192.168.14.250 192.168.14.254
+
+ip dhcp excluded-address 192.168.15.1 192.168.15.149
+ip dhcp excluded-address 192.168.15.250 192.168.15.254
+
+ip dhcp pool VLAN10_GI
+ network 192.168.10.0 255.255.255.0
+ default-router 192.168.10.254
+ dns-server 8.8.8.8 8.8.4.4
+ domain-name acadenspy.lab
+exit
+ip dhcp pool VLAN11_GM
+ network 192.168.11.0 255.255.255.0
+ default-router 192.168.11.254
+ dns-server 8.8.8.8 8.8.4.4
+ domain-name acadenspy.lab
+exit
+ip dhcp pool VLAN12_GELE
+ network 192.168.12.0 255.255.255.0
+ default-router 192.168.12.254
+ dns-server 8.8.8.8 8.8.4.4
+ domain-name acadenspy.lab
+exit
+ip dhcp pool VLAN13_GIND
+ network 192.168.13.0 255.255.255.0
+ default-router 192.168.13.254
+ dns-server 8.8.8.8 8.8.4.4
+ domain-name acadenspy.lab
+exit
+ip dhcp pool VLAN14_GC
+ network 192.168.14.0 255.255.255.0
+ default-router 192.168.14.254
+ dns-server 8.8.8.8 8.8.4.4
+ domain-name acadenspy.lab
+exit
+ip dhcp pool VLAN15_AHN
+ network 192.168.15.0 255.255.255.0
+ default-router 192.168.15.254
+ dns-server 8.8.8.8 8.8.4.4
+ domain-name acadenspy.lab
+exit
+
+vlan 77
+ name PARC
+ exit
+
+interface range Ethernet1/0-3
+ switchport mode access
+ switchport access vlan 77
+ shutdown
+ exit
+
+do copy run start
